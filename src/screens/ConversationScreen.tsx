@@ -59,12 +59,13 @@ const ConversationScreen = () => {
       />
       <View style={[styles.bottomContainer, {paddingBottom: insets.bottom}]}>
         <TouchableOpacity>
-          <Icon type='feather' name='image' size={25} color={colors.gray} />
+          <Icon type='font-awesome' name='camera' size={22} color={colors.gray} />
         </TouchableOpacity>
         <View 
           style={styles.textInputWrapper}>
           <TextInput 
             placeholder='Message'
+            value={message}
             onChangeText={text => setMessage(text)} />
         </View>
         <TouchableOpacity
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
   bottomContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
     paddingTop: 10,
     paddingHorizontal: 16,
     backgroundColor: colors.white,

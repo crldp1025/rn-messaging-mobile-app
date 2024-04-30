@@ -1,5 +1,4 @@
 import React from 'react';
-import Text from '../components/common/Text';
 import Container from '../components/common/Container';
 import MessageList from '../components/message/MessageList';
 
