@@ -1,67 +1,62 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import ContactsScreen from '../../screens/ContactsScreen';
-import SettingsScreen from '../../screens/SettingsScreen';
+import { NavigationContainer, ParamListBase, useNavigation } from '@react-navigation/native';
+import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from './Icon';
-import MessageScreen from '../../screens/MessageScreen';
 import LoginScreen from '../../screens/LoginScreen';
 import RegistrationScreen from '../../screens/RegistrationScreen';
+import HomeScreen from '../../screens/HomeScreen';
+import ConversationScreen from '../../screens/ConversationScreen';
+import { IMessageProps } from '../../interfaces/Message';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import colors from '../../themes/colors';
 
-const Tab = createBottomTabNavigator();
+export type RootStackParamList = {
+  Home?: undefined;
+  Conversation: {data: IMessageProps};
+  Login?: undefined;
+  Registration?: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const BottomNavigator = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>()
 
   return (
     <>
-      <Tab.Navigator
+      <Stack.Navigator
         screenOptions={{
-          headerStyle: {
-            shadowColor: colors.gray
-          },
-          tabBarShowLabel: false,
-          tabBarActiveTintColor: colors.primary
-        }}
-        initialRouteName='MessageScreen'>
-        <Tab.Screen 
-          name='ContactsScreen' 
-          component={ContactsScreen}
+          headerBackTitleVisible: false
+        }}>
+        <Stack.Screen 
+          name='Home' 
+          component={HomeScreen}
           options={{
-            tabBarIcon: ({color, size}) => (
-              <Icon type='font-awesome-5' name='users' size={size} color={color} />
-            ),
+            title: '',
+            headerShown: false
           }} />
-        <Tab.Screen 
-          name='MessageScreen' 
-          component={MessageScreen}
-          options={{
-            title: 'Chats',
-            tabBarIcon: ({color, size}) => (
-              <Icon type='ionicon' name='chatbubble' size={size} color={color} />
+        <Stack.Screen 
+          name='Conversation' 
+          component={ConversationScreen}
+          options={({route}) => ({
+            title: route.params?.data.sender.name,
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}>
+                <Icon type="feather" name="chevron-left" size={30} />
+              </TouchableOpacity>
             )
-          }} />
-        <Tab.Screen 
-          name='SettingsScreen' 
-          component={SettingsScreen}
-          options={{
-            tabBarIcon: ({color, size}) => (
-              <Icon type='font-awesome' name='cog' size={size} color={color} />
-            )
-          }} />
-      </Tab.Navigator>
+          })} />
+      </Stack.Navigator>
     </>
   );
 };
 
-const Stack = createNativeStackNavigator();
-
 const UnauthenticatedScreens = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name='LoginScreen' component={LoginScreen} />
-      <Stack.Screen name='RegistrationScreen' component={RegistrationScreen} />
+      <Stack.Screen name='Login' component={LoginScreen} />
+      <Stack.Screen name='Registration' component={RegistrationScreen} />
     </Stack.Navigator>
   );
 };

@@ -12,7 +12,7 @@ const MessageList = () => {
       data={messages}
       keyExtractor={(item) => item.id.toString()}
       renderItem={({item, index}) => (
-        <MessageListItem key={index} item={item} />
+        <MessageListItem key={index} data={item} />
       )}
       ItemSeparatorComponent={() => (
         <View

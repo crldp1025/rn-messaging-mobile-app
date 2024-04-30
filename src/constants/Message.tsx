@@ -5,7 +5,7 @@ export const messages: IMessageProps[] = [
     id: 0,
     sender: {
       name: 'Lorem ipsum',
-      avatar: undefined
+      avatar: 'https://wallpapers.com/images/hd/cool-profile-picture-87h46gcobjl5e4xu.jpg'
     },
     message: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In gravida dolor eu felis dignissim, eget dignissim mi pellentesque. Suspendisse non sollicitudin dolor, nec sodales velit.',
     date: '',

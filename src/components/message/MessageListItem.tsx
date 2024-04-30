@@ -7,52 +7,54 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import colors from '../../themes/colors';
 import Icon from '../common/Icon';
 import Avatar from '../common/Avatar';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-interface IMessageListItemProps {
-  item: IMessageProps;
+interface IMessageListdataProps {
+  data: IMessageProps;
 }
 
 const renderRightActions = (progress: Animated.AnimatedInterpolation<number>, dragX: Animated.AnimatedInterpolation<number>) => {
   return (
-    <>
-      <RectButton 
-        style={[
-          styles.rightButton, 
-          { backgroundColor: colors.red }
-        ]}
-        onPress={() => console.log()}
-      >
-        <Icon type="material-community" name="delete" size={30} color={colors.white} />
-      </RectButton>
-      {/* <RectButton style={[styles.rightButton, {backgroundColor: colors.primary}]}>
-        <Icon type="feather" name="edit" size={25} color={colors.white} />
-      </RectButton> */}
-    </>
+    <RectButton 
+      style={[
+        styles.rightButton, 
+        { backgroundColor: colors.red }
+      ]}
+      onPress={() => console.log()}>
+      <Icon type="material-community" name="delete" size={30} color={colors.white} />
+    </RectButton>
   );
 };
 
-const MessageListItem = ({item}: IMessageListItemProps) => {
+const MessageListdata = ({data}: IMessageListdataProps) => {
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+
   return (
     <Swipeable
       renderRightActions={renderRightActions}
       rightThreshold={50}
       overshootRight={false}>
-      <RectButton style={styles.container} onPress={() => console.log('on press')}>
+      <RectButton 
+        style={styles.container} 
+        onPress={() => navigation.navigate('Conversation', {data})}>
         <View style={{width: 50, height: 50}}>
-          <Avatar />
+          <Avatar 
+            name={data.sender.name}
+            url={data.sender.avatar} />
         </View>
         <View style={{flex: 1}}>
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.title}> 
-              {item.sender.name}
+              {data.sender.name}
             </Text>
-            <Text style={{fontSize: 13}}>9:00pm</Text>
+            <Text style={styles.time}>9:00pm</Text>
           </View>
           <Text 
             numberOfLines={1}
             ellipsizeMode='tail'
             style={styles.message}>
-            {item.message}
+            {data.message}
           </Text>
         </View>
       </RectButton>
@@ -78,7 +80,12 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
   message: {
-    fontSize: 14
+    fontSize: 14,
+    color: colors.darkGray
+  },
+  time: {
+    fontSize: 13,
+    color: colors.darkGray
   },
   rightButton: {
     width: 80,
@@ -87,4 +94,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default MessageListItem;
+export default MessageListdata;
