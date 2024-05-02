@@ -1,11 +1,11 @@
 import React from 'react';
-import Text from '../components/common/Text';
 import Container from '../components/common/Container';
+import ContactList from '../components/contacts/ContactList';
 
 const ContactsScreen = () => {
   return (
     <Container>
-      <Text>Contacts</Text>
+      <ContactList />
     </Container>
   );
 };

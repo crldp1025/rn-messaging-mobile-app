@@ -1,12 +1,10 @@
-export interface IMessageSenderProps {
-  name: string;
-  avatar: string | undefined;
-}
+import { IUserProps } from "./User";
+
 
 export interface IMessageProps {
   id: number,
-  sender: IMessageSenderProps;
-  message: string;
+  user: IUserProps;
+  recentMessage: string;
   date: string;
   isOpened: boolean;
   isTyping: boolean;

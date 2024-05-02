@@ -37,16 +37,16 @@ const MessageListdata = ({data}: IMessageListdataProps) => {
       overshootRight={false}>
       <RectButton 
         style={styles.container} 
-        onPress={() => navigation.navigate('Conversation', {data})}>
+        onPress={() => navigation.navigate('Conversation', {data: data.user})}>
         <View style={{width: 50, height: 50}}>
           <Avatar 
-            name={data.sender.name}
-            url={data.sender.avatar} />
+            name={`${data.user.firstName} ${data.user.lastName}`}
+            url={data.user.avatar} />
         </View>
         <View style={{flex: 1}}>
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.title}> 
-              {data.sender.name}
+              {`${data.user.firstName} ${data.user.lastName}`}
             </Text>
             <Text style={styles.time}>9:00pm</Text>
           </View>
@@ -54,7 +54,7 @@ const MessageListdata = ({data}: IMessageListdataProps) => {
             numberOfLines={1}
             ellipsizeMode='tail'
             style={styles.message}>
-            {data.message}
+            {data.recentMessage}
           </Text>
         </View>
       </RectButton>

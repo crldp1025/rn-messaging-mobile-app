@@ -1,18 +1,23 @@
 import React from 'react';
 import { NavigationContainer, ParamListBase, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
-import Icon from './Icon';
 import LoginScreen from '../../screens/LoginScreen';
 import RegistrationScreen from '../../screens/RegistrationScreen';
 import HomeScreen from '../../screens/HomeScreen';
 import ConversationScreen from '../../screens/ConversationScreen';
-import { IMessageProps } from '../../interfaces/Message';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import colors from '../../themes/colors';
+import ContactDetailsScreen from '../../screens/ContactDetailsScreen';
+import Avatar from './Avatar';
+import { View } from 'react-native';
+import { IUserProps } from '../../interfaces/User';
+import EditProfileScreen from '../../screens/EditProfileScreen';
+import ChangePasswordScreen from '../../screens/ChangePasswordScreen';
 
 export type RootStackParamList = {
   Home?: undefined;
-  Conversation: {data: IMessageProps};
+  Conversation: {data: IUserProps};
+  ContactDetails: {data: IUserProps};
+  EditProfile: undefined;
+  ChangePassword: undefined;
   Login?: undefined;
   Registration?: undefined;
 };
@@ -26,7 +31,7 @@ const BottomNavigator = () => {
     <>
       <Stack.Navigator
         screenOptions={{
-          headerBackTitleVisible: false
+          headerBackTitleVisible: false,
         }}>
         <Stack.Screen 
           name='Home' 
@@ -39,14 +44,35 @@ const BottomNavigator = () => {
           name='Conversation' 
           component={ConversationScreen}
           options={({route}) => ({
-            title: route.params?.data.sender.name,
-            headerLeft: () => (
-              <TouchableOpacity
-                onPress={() => navigation.goBack()}>
-                <Icon type="feather" name="chevron-left" size={30} />
-              </TouchableOpacity>
+            title: `${route.params?.data.firstName} ${route.params?.data.lastName}`,
+            headerRight: () => (
+              <View>
+                <Avatar 
+                  name={`${route.params?.data.firstName} ${route.params?.data.lastName}`}
+                  size='sm'
+                  url={route.params?.data.avatar} />
+              </View>
             )
           })} />
+        <Stack.Screen 
+          name='ContactDetails' 
+          component={ContactDetailsScreen}
+          options={({route}) => ({
+            title: '',
+            headerTransparent: true
+          })} />
+        <Stack.Screen 
+          name='EditProfile' 
+          component={EditProfileScreen}
+          options={{
+            title: 'Edit Profile'
+          }} />
+        <Stack.Screen 
+          name='ChangePassword' 
+          component={ChangePasswordScreen}
+          options={{
+            title: 'Change Password'
+          }} />
       </Stack.Navigator>
     </>
   );

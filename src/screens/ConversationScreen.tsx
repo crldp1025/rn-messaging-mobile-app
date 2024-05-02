@@ -1,6 +1,5 @@
 import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import React, { useMemo, useRef, useState } from 'react';
-import { RootStackParamList } from './HomeScreen';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Bubble, { BubbleType } from '../components/common/Bubble';
 import { StyleSheet, FlatList, View } from 'react-native';
@@ -9,6 +8,7 @@ import TextInput from '../components/common/TextInput';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from '../components/common/Icon';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { RootStackParamList } from '../components/common/Navigation';
 
 const conversationData = [
   {
@@ -64,9 +64,11 @@ const ConversationScreen = () => {
         <View 
           style={styles.textInputWrapper}>
           <TextInput 
+            style={styles.textInput}
             placeholder='Message'
             value={message}
-            onChangeText={text => setMessage(text)} />
+            onChangeText={text => setMessage(text)}
+            multiline={true} />
         </View>
         <TouchableOpacity
           disabled={sendButtonState.isDisabled}>
@@ -110,6 +112,10 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     paddingHorizontal: 10,
     borderRadius: 10
+  },
+  textInput: {
+    paddingVertical: 0,
+    maxHeight: 100
   }
 });
 
