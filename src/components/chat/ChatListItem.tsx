@@ -1,17 +1,16 @@
 import React from 'react';
-import Text from '../common/Text';
-import { IMessageProps } from '../../interfaces/Message';
-import { Animated, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { RectButton } from 'react-native-gesture-handler';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { Animated, StyleSheet, View } from 'react-native';
 import colors from '../../themes/colors';
-import Icon from '../common/Icon';
+import { RectButton, Swipeable } from 'react-native-gesture-handler';
 import Avatar from '../common/Avatar';
+import Text from '../common/Text';
+import { IChatProps } from '../../interfaces/Chat';
+import Icon from '../common/Icon';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-interface IMessageListdataProps {
-  data: IMessageProps;
+interface IChatListItemProps {
+  data: IChatProps;
 }
 
 const renderRightActions = (progress: Animated.AnimatedInterpolation<number>, dragX: Animated.AnimatedInterpolation<number>) => {
@@ -27,9 +26,9 @@ const renderRightActions = (progress: Animated.AnimatedInterpolation<number>, dr
   );
 };
 
-const MessageListItem = ({data}: IMessageListdataProps) => {
+const ChatListItem = ({data}: IChatListItemProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-
+  
   return (
     <Swipeable
       renderRightActions={renderRightActions}
@@ -40,23 +39,23 @@ const MessageListItem = ({data}: IMessageListdataProps) => {
         onPress={() => navigation.navigate('Conversation', {conversationId: data.id, data: data.user})}>
         <View style={{width: 50, height: 50}}>
           <Avatar 
-            name={`${data.user.firstName} ${data.user.lastName}`}
+            name={data.user.displayName}
             url={data.user.avatar} />
         </View>
         <View style={{flex: 1}}>
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.title}> 
-              {`${data.user.firstName} ${data.user.lastName}`}
+              {data.user.displayName}
             </Text>
             <Text style={styles.time}>9:00pm</Text>
           </View>
           <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
-            <Text 
+            {/* <Text 
               numberOfLines={1}
               ellipsizeMode='tail'
               style={[styles.message]}>
               {data.message}
-            </Text>
+            </Text> */}
             {!data.isViewed &&
               <View
                 style={{width: 10, height: 10, backgroundColor: colors.red, borderRadius: 10}}></View>
@@ -101,4 +100,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default MessageListItem;
+export default ChatListItem;

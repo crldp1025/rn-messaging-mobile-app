@@ -1,5 +1,5 @@
 import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Bubble, { BubbleType } from '../components/common/Bubble';
 import { StyleSheet, FlatList, View } from 'react-native';
@@ -9,6 +9,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from '../components/common/Icon';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../components/common/Navigation';
+import firestore from '@react-native-firebase/firestore';
 
 const conversationData = [
   {
@@ -28,12 +29,41 @@ const conversationData = [
   },
 ]
 
+interface IMessageProps {
+  id: number;
+  message: string;
+  created?: string;
+}
+
+const userId = 'HigycpBDjj2j5qTCIT7X';
+
 const ConversationScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const route = useRoute<RouteProp<RootStackParamList, 'Conversation'>>();
   const flatListRef = useRef<FlatList>(null);
   const insets = useSafeAreaInsets();
   const [message, setMessage] = useState<string>('');
+  const [conversations, setConversations] = useState<{ id: number; message: any; }[]>([]);
+  const chatRef = firestore().collection('Chats');
+
+  const storeMessage = async () => {
+    await chatRef.doc(route.params.conversationId).update({
+      updatedAt: firestore.FieldValue.serverTimestamp(),
+      viewed: false
+    });
+
+    await chatRef.doc(route.params.conversationId).collection('Messages').add({
+      user: userId,
+      message: message,
+      createdAt: firestore.FieldValue.serverTimestamp()
+    });
+
+    setMessage('');
+  }
+
+  const handleSendMessage = () => {
+    storeMessage();
+  };
 
   const sendButtonState = useMemo(() => {
     return {
@@ -42,14 +72,41 @@ const ConversationScreen = () => {
     }
   }, [message]);
 
+  const handleUpdateChatView = async () => {
+    await chatRef.doc(route.params.conversationId).update({
+      viewed: true
+    });
+  }
+
+  const handleFetchConversation = async () => {
+    chatRef.doc(route.params.conversationId).collection('Messages').orderBy('createdAt', 'desc').onSnapshot(querySnapshot => {
+      let newConversations: { id: number; type: string, message: any; }[] = [];
+      let counter = 0;
+      querySnapshot.forEach(documentSnapshot => {
+        newConversations.push({
+          id: counter,
+          type: (userId === documentSnapshot.data().user) ? 'sent' : 'received',
+          message: documentSnapshot.data().message
+        });
+        counter++;
+      });
+      setConversations(newConversations);
+    });
+  }
+
+  useEffect(() => {
+    handleUpdateChatView();
+    handleFetchConversation();
+  }, []);
+
   return (
     <View style={styles.container}>
       <FlatList
         ref={flatListRef}
-        data={conversationData}
-        keyExtractor={(item) => item.id.toString()}
+        data={conversations}
+        keyExtractor={(item, index) => item.id.toString()}
         renderItem={({item, index}) => (
-          <Bubble key={item.id} type={item.type as BubbleType} message={item.message}  />
+          <Bubble key={index} type={item.type as BubbleType} message={item.message}  />
         )}
         ItemSeparatorComponent={() => <View style={styles.itemSeparator}></View>}
         inverted={true}
@@ -71,7 +128,8 @@ const ConversationScreen = () => {
             multiline={true} />
         </View>
         <TouchableOpacity
-          disabled={sendButtonState.isDisabled}>
+          disabled={sendButtonState.isDisabled}
+          onPress={() => handleSendMessage()}>
           <Icon type='ionicon' name='send' size={25} color={sendButtonState.color} />
         </TouchableOpacity>
       </View>

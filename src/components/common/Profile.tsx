@@ -24,29 +24,10 @@ const Profile = ({user}: IProfileProps) => {
   return (
     <>
       <View style={styles.avatarWrapper}>
-        <Animated.View
-          style={{
-            width: 120,
-            transform: [
-              {
-                translateY: avatarAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-headerHeight + (headerHeight / 4), 0]
-                }),
-              },
-              {
-                scale: avatarAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0.35, 1]
-                }),
-              }
-            ]
-          }}>
-          <Avatar 
-            name={user.firstName}
-            url={user.avatar}
-            size='lg' />
-        </Animated.View>
+        <Avatar 
+          name={user.firstName}
+          url={user.avatar}
+          size='lg' />
       </View>
       <View>
         <Text style={styles.name}>{`${user.firstName} ${user.lastName}`}</Text>

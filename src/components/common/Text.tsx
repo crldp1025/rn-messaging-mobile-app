@@ -14,7 +14,7 @@ const Text = ({children, style, ...props}: TextProps) => {
 const styles = StyleSheet.create({
   text: {
     fontFamily: 'OpenSans-Regular',
-    fontSize: 16
+    fontSize: 16,
   }
 });
 

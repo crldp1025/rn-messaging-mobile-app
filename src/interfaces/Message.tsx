@@ -1,11 +1,10 @@
 import { IUserProps } from "./User";
 
-
 export interface IMessageProps {
-  id: number,
+  id: string,
   user: IUserProps;
-  recentMessage: string;
-  date: string;
-  isOpened: boolean;
-  isTyping: boolean;
+  message?: string;
+  updatedAt: string;
+  isViewed?: boolean;
+  isTyping?: boolean;
 }

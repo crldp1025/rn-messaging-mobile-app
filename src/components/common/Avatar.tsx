@@ -41,7 +41,7 @@ const Avatar = ({name, size = 'md', url = undefined}: IAvatarProps) => {
     <View style={[styles.container, avatarStyle.wrapper]}>
       {!url &&
         <Text style={[styles.text, avatarStyle.defaultAvatar]}>
-          {getUserInital(name)}
+          C
         </Text>
       }
       {url &&

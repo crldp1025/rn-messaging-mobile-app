@@ -4,6 +4,7 @@ import { contacts } from '../../constants/Contact';
 import colors from '../../themes/colors';
 import ContactListItem from './ContactListItem';
 import Search from '../common/Search';
+import firestore from '@react-native-firebase/firestore';
 
 const ContactHeader = () => {
   const [searchContact, setSearchContact] = useState<string>('');
@@ -16,16 +17,16 @@ const ContactHeader = () => {
 };
 
 const ContactList = () => {
+  const usersRef = firestore().collection('Users');
+
   return (
-    <>
-      <FlatList
-        data={contacts}
-        keyExtractor={(item) => item.email}
-        ListHeaderComponent={ContactHeader}
-        renderItem={({item, index}) => <ContactListItem key={index} data={item} />}
-        ItemSeparatorComponent={() => <View style={styles.itemSeparator}></View>}
-      />
-    </>
+    <FlatList
+      data={contacts}
+      keyExtractor={(item) => item.email}
+      ListHeaderComponent={ContactHeader}
+      renderItem={({item, index}) => <ContactListItem key={index} data={item} />}
+      ItemSeparatorComponent={() => <View style={styles.itemSeparator}></View>}
+    />
   );
 };
 

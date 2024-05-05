@@ -6,7 +6,7 @@ import Text from './Text';
 export type BubbleType = 'sent' | 'received';
 
 interface IBubbleProps {
-  type: BubbleType;
+  type?: BubbleType;
   message: string;
 }
 
@@ -42,7 +42,7 @@ const Bubble = ({type = 'sent', message}: IBubbleProps) => {
       tailOverlay: [styles.tailOverlay, tailOverlay],
       bubbleText: [bubbleText]
     }
-  }, []);
+  }, [type, message]);
 
   return (
     <View style={bubbleStyle.container}>

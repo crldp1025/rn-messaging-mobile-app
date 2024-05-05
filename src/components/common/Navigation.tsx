@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer, ParamListBase, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LoginScreen from '../../screens/LoginScreen';
@@ -11,10 +11,13 @@ import { View } from 'react-native';
 import { IUserProps } from '../../interfaces/User';
 import EditProfileScreen from '../../screens/EditProfileScreen';
 import ChangePasswordScreen from '../../screens/ChangePasswordScreen';
+import { useAppDispatch, useAppSelector } from '../../tools/hooks';
+import auth from '@react-native-firebase/auth';
+import { authenticateUser } from '../../state/authSlice';
 
 export type RootStackParamList = {
   Home?: undefined;
-  Conversation: {data: IUserProps};
+  Conversation: {conversationId: string, data: IUserProps};
   ContactDetails: {data: IUserProps};
   EditProfile: undefined;
   ChangePassword: undefined;
@@ -44,11 +47,11 @@ const BottomNavigator = () => {
           name='Conversation' 
           component={ConversationScreen}
           options={({route}) => ({
-            title: `${route.params?.data.firstName} ${route.params?.data.lastName}`,
+            title: route.params?.data.displayName,
             headerRight: () => (
               <View>
                 <Avatar 
-                  name={`${route.params?.data.firstName} ${route.params?.data.lastName}`}
+                  name={route.params?.data.displayName}
                   size='sm'
                   url={route.params?.data.avatar} />
               </View>
@@ -80,7 +83,10 @@ const BottomNavigator = () => {
 
 const UnauthenticatedScreens = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false
+      }}>
       <Stack.Screen name='Login' component={LoginScreen} />
       <Stack.Screen name='Registration' component={RegistrationScreen} />
     </Stack.Navigator>
@@ -88,9 +94,38 @@ const UnauthenticatedScreens = () => {
 };
 
 const Navigation = () => {
+  const [initializing, setInitializing] = useState<boolean>(true);
+  const { user } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  
+  useEffect(() => {
+    const authListener = auth().onAuthStateChanged(resUser => {
+      let authUser: IUserProps | undefined = undefined;
+      if(resUser !== null) {
+        authUser = {
+          email: resUser.email!,
+          displayName: resUser.displayName!
+        }
+      } else {
+        authUser = undefined;
+      }
+      setInitializing(false);
+      dispatch(authenticateUser(authUser));
+    });
+
+    return authListener; // unsubscribe on unmount
+  }, []);
+
+  if(initializing) return null;
+
   return (
     <NavigationContainer>
-      <BottomNavigator />
+      {user &&
+        <BottomNavigator />
+      }
+      {!user &&
+        <UnauthenticatedScreens />
+      }
     </NavigationContainer>
   );
 };

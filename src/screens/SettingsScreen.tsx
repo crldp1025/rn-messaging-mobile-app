@@ -11,15 +11,19 @@ import Icon from '../components/common/Icon';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../components/common/Navigation';
+import { useAppDispatch } from '../tools/hooks';
+import { logoutUser } from '../state/authSlice';
 
 const SettingsScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const dispatch = useAppDispatch();
 
   const handleOnPressLogout = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
       {text: 'Cancel', style: 'destructive'},
       {
-        text: 'Confirm'
+        text: 'Confirm',
+        onPress: () => dispatch(logoutUser())
       }
     ]);
   }

@@ -8,6 +8,7 @@ import colors from '../themes/colors';
 import ContactsScreen from './ContactsScreen';
 import SettingsScreen from './SettingsScreen';
 import { TouchableOpacity } from 'react-native';
+import ChatScreen from './ChatScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -27,7 +28,7 @@ const HomeScreen = () => {
         tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.4)',
         tabBarActiveTintColor: colors.white,
       }}
-      initialRouteName='Message'>
+      initialRouteName='Chat'>
       <Tab.Screen 
         name='Contact' 
         component={ContactsScreen}
@@ -37,8 +38,8 @@ const HomeScreen = () => {
           )
         }} />
       <Tab.Screen 
-        name='Message' 
-        component={MessageScreen}
+        name='Chat' 
+        component={ChatScreen}
         options={{
           title: 'Chats',
           tabBarIcon: ({color, size}) => (
