@@ -1,3 +1,5 @@
+import { IMessageProps } from "./Chat";
+
 export interface IUserProps {
   id?: string;
   email: string;
@@ -13,4 +15,8 @@ export interface IUserLoginProps {
 export interface IUserRegistrationProps extends IUserProps {
   password: string;
   retypePassword: string;
+};
+
+export interface IContactProps extends IUserProps {
+  messages?: IMessageProps[];
 };

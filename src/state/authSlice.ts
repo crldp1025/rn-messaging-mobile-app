@@ -1,4 +1,4 @@
-import { createAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAction, createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
 import { IUserLoginProps, IUserProps } from "../interfaces/User";
 import auth from '@react-native-firebase/auth';
 
@@ -56,9 +56,6 @@ const authSlice = createSlice({
   initialState,
   extraReducers: (builder) => {
     builder
-      .addCase(loginUser.pending, (state) => {
-        state.loading = true;
-      })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.error = undefined;
@@ -68,9 +65,6 @@ const authSlice = createSlice({
         state.user = undefined;
         state.error = action.payload as string;
       })
-      .addCase(logoutUser.pending, (state) => {
-        state.loading = true;
-      })
       .addCase(logoutUser.fulfilled, () => initialState)
       .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
@@ -78,6 +72,9 @@ const authSlice = createSlice({
       })
       .addCase(authenticateUser, (state, action) => {
         state.user = action.payload;
+      })
+      .addMatcher(isAnyOf(loginUser.pending, logoutUser.pending), (state) => {
+        state.loading = true;
       });
   },
   reducers: {}

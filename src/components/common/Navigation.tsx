@@ -12,12 +12,13 @@ import { IUserProps } from '../../interfaces/User';
 import EditProfileScreen from '../../screens/EditProfileScreen';
 import ChangePasswordScreen from '../../screens/ChangePasswordScreen';
 import { useAppDispatch, useAppSelector } from '../../tools/hooks';
-import auth from '@react-native-firebase/auth';
 import { authenticateUser } from '../../state/authSlice';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 export type RootStackParamList = {
   Home?: undefined;
-  Conversation: {conversationId: string, data: IUserProps};
+  Conversation: {chatId: string, data: IUserProps};
   ContactDetails: {data: IUserProps};
   EditProfile: undefined;
   ChangePassword: undefined;
@@ -95,25 +96,33 @@ const UnauthenticatedScreens = () => {
 
 const Navigation = () => {
   const [initializing, setInitializing] = useState<boolean>(true);
-  const { user } = useAppSelector((state) => state.auth);
+  const {user} = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
-  
-  useEffect(() => {
-    const authListener = auth().onAuthStateChanged(resUser => {
+
+  const handleAuthListener = () => {
+    auth().onAuthStateChanged(async (resUser) => {
       let authUser: IUserProps | undefined = undefined;
       if(resUser !== null) {
         authUser = {
           email: resUser.email!,
           displayName: resUser.displayName!
-        }
+        };
+        const userDetails = await firestore().collection('Users').where('email', '==', resUser.email).get();
+        if(userDetails.size > 0) authUser.id = userDetails.docs[0].id;
       } else {
         authUser = undefined;
       }
       setInitializing(false);
       dispatch(authenticateUser(authUser));
     });
+  }
+  
+  useEffect(() => {
+    handleAuthListener();
 
-    return authListener; // unsubscribe on unmount
+    return () => {
+      handleAuthListener();
+    };
   }, []);
 
   if(initializing) return null;

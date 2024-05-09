@@ -22,14 +22,14 @@ const ContactListItem = ({data}: IContactListItemProps) => {
         onPress={() => navigation.navigate('Conversation', {data})}>
         <View>
           <Avatar 
-            name={data.firstName}
+            name={data.displayName}
             size='sm'
             url={data.avatar} />
         </View>
         <View style={{flex: 1}}>
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.title}> 
-              {`${data.firstName} ${data.lastName}`}
+              {data.displayName}
             </Text>
           </View>
         </View>

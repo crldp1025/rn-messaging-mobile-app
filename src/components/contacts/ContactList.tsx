@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { contacts } from '../../constants/Contact';
 import colors from '../../themes/colors';
 import ContactListItem from './ContactListItem';
 import Search from '../common/Search';
-import firestore from '@react-native-firebase/firestore';
+import { useAppSelector } from '../../tools/hooks';
 
 const ContactHeader = () => {
   const [searchContact, setSearchContact] = useState<string>('');
@@ -17,7 +16,7 @@ const ContactHeader = () => {
 };
 
 const ContactList = () => {
-  const usersRef = firestore().collection('Users');
+  const {contacts} = useAppSelector((state) => state.contacts);
 
   return (
     <FlatList

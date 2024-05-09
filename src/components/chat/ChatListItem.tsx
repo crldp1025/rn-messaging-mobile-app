@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import colors from '../../themes/colors';
 import { RectButton, Swipeable } from 'react-native-gesture-handler';
@@ -8,6 +8,7 @@ import { IChatProps } from '../../interfaces/Chat';
 import Icon from '../common/Icon';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useAppSelector } from '../../tools/hooks';
 
 interface IChatListItemProps {
   data: IChatProps;
@@ -28,6 +29,27 @@ const renderRightActions = (progress: Animated.AnimatedInterpolation<number>, dr
 
 const ChatListItem = ({data}: IChatListItemProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const {user} = useAppSelector((state) => state.auth);
+
+  const date = useMemo(() => {
+    let resTime = '';
+    if(data.updatedAt !== null) {
+      const updatedAt = new Date(data.updatedAt!.toDate());
+      const today = new Date();
+  
+      if(today.getFullYear() == updatedAt.getFullYear()) {
+        if(today.toDateString() == updatedAt.toDateString()) {
+          resTime = updatedAt.toLocaleString('en-US', {hour: 'numeric', minute: 'numeric', hour12: true });
+        } else {
+          resTime = updatedAt.toLocaleString('en-US', {month: '2-digit', day: '2-digit'});
+        }
+      } else {
+        resTime = updatedAt.toLocaleString('en-US', {month: '2-digit', day: '2-digit', year: '2-digit'});
+      }
+    }
+
+    return resTime;
+  }, [data]);
   
   return (
     <Swipeable
@@ -39,26 +61,31 @@ const ChatListItem = ({data}: IChatListItemProps) => {
         onPress={() => navigation.navigate('Conversation', {conversationId: data.id, data: data.user})}>
         <View style={{width: 50, height: 50}}>
           <Avatar 
-            name={data.user.displayName}
-            url={data.user.avatar} />
+            name={data.user!.displayName}
+            url={data.user?.avatar} />
         </View>
         <View style={{flex: 1}}>
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.title}> 
-              {data.user.displayName}
+              {data.user!.displayName}
             </Text>
-            <Text style={styles.time}>9:00pm</Text>
+            <Text style={styles.time}>{date}</Text>
           </View>
           <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
-            {/* <Text 
+            <Text 
               numberOfLines={1}
               ellipsizeMode='tail'
               style={[styles.message]}>
-              {data.message}
-            </Text> */}
-            {!data.isViewed &&
-              <View
-                style={{width: 10, height: 10, backgroundColor: colors.red, borderRadius: 10}}></View>
+              {data.latestMessage?.message}
+            </Text>
+            {(!data.isViewed && data.latestMessage?.userId !== user?.id) &&
+              <View 
+                style={{
+                  width: 10, 
+                  height: 10, 
+                  backgroundColor: colors.red, 
+                  borderRadius: 10
+                }}></View>
             }
           </View>
         </View>

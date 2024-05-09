@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MessageScreen from './MessageScreen';
@@ -9,11 +9,37 @@ import ContactsScreen from './ContactsScreen';
 import SettingsScreen from './SettingsScreen';
 import { TouchableOpacity } from 'react-native';
 import ChatScreen from './ChatScreen';
+import { useAppDispatch, useAppSelector } from '../tools/hooks';
+import { getAllContacts } from '../state/contactSlice';
+import { getAllChats } from '../state/chatSlice';
+import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+
+const chatsRef = firestore().collection('Chats');
 
 const Tab = createBottomTabNavigator();
 
 const HomeScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const {user} = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+
+  const handleChatListener = () => {
+    chatsRef
+      .where('users', 'array-contains', user?.id)
+      .orderBy('updatedAt', 'desc') 
+      .onSnapshot(async (chatSnapshot) => {
+        dispatch(getAllChats({authUserId: user?.id as string, chatSnapshot: chatSnapshot}))
+      }, error => {
+        console.log('error', error)
+      });
+  };
+
+  useEffect(() => {
+    // Trigger contacts listener
+    dispatch(getAllContacts(user?.id as string));
+    
+    handleChatListener();
+  }, []);
 
   return (
     <Tab.Navigator

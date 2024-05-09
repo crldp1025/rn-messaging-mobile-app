@@ -1,28 +1,42 @@
-import React, { useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import colors from '../../themes/colors';
 import Search from '../common/Search';
 import ChatListItem from './ChatListItem';
-import firestore from '@react-native-firebase/firestore';
-
-const MessageHeader = () => {
-  const [searchMessage, setSearchMessage] = useState<string>('');
-
-  return (
-    <Search 
-      value={searchMessage}
-      handleSearch={value => setSearchMessage(value)} />
-  );
-};
+import { useAppSelector } from '../../tools/hooks';
+import { IChatProps } from '../../interfaces/Chat';
+import { FlatList } from 'react-native-gesture-handler';
 
 const ChatList = () => {
-  const userRef = firestore().collection('Users');
-  const chatRef = firestore().collection('Chats');
+  const [chatList, setChatList] = useState<IChatProps[]>([]);
+  const {chats} = useAppSelector((state) => state.chats);
+
+  const MessageHeader = () => {
+    const [searchMessage, setSearchMessage] = useState<string>('');
+
+    useEffect(() => {
+      const debounceSearch = setTimeout(() => {
+        console.log(searchMessage)
+      }, 1000);
+
+      return () => clearTimeout(debounceSearch);
+    }, [searchMessage]);
+  
+    return (
+      <Search 
+        value={searchMessage}
+        handleSearch={value => setSearchMessage(value)} />
+    );
+  };
+
+  useEffect(() => {
+    setChatList(chats);
+  }, [chats]);
 
   return (
     <FlatList
-      data={[]}
-      keyExtractor={(item, index) => index.toString()}
+      data={chatList}
+      keyExtractor={(item, index) => item.id as string}
       ListHeaderComponent={MessageHeader}
       renderItem={({item, index}) => <ChatListItem key={index} data={item} />}
       ItemSeparatorComponent={() => <View style={styles.itemSeparator}></View>}
