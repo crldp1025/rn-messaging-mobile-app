@@ -15,30 +15,44 @@ import { getAllChats } from '../state/chatSlice';
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 
 const chatsRef = firestore().collection('Chats');
+const contactsRef = firestore().collection('Contacts');
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator();  
 
 const HomeScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const {user} = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
 
+  const handleContactListener = () => {
+    contactsRef
+    .where('userId', '==', user?.id)
+    .onSnapshot(async (contactsSnapshot) => {
+      dispatch(getAllContacts(contactsSnapshot));
+    }, error => {
+      console.log(error)
+    });
+  };
+
   const handleChatListener = () => {
     chatsRef
-      .where('users', 'array-contains', user?.id)
-      .orderBy('updatedAt', 'desc') 
-      .onSnapshot(async (chatSnapshot) => {
-        dispatch(getAllChats({authUserId: user?.id as string, chatSnapshot: chatSnapshot}))
-      }, error => {
-        console.log('error', error)
-      });
+    .where('users', 'array-contains', user?.id)
+    .orderBy('updatedAt', 'desc') 
+    .onSnapshot(async (chatSnapshot) => {
+      dispatch(getAllChats({authUserId: user?.id as string, chatSnapshot: chatSnapshot}))
+    }, error => {
+      console.log('error', error)
+    });
   };
 
   useEffect(() => {
-    // Trigger contacts listener
-    dispatch(getAllContacts(user?.id as string));
-    
+    handleContactListener();
     handleChatListener();
+
+    return () => {
+      handleContactListener();
+      handleChatListener();
+    };
   }, []);
 
   return (

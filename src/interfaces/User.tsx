@@ -2,8 +2,8 @@ import { IMessageProps } from "./Chat";
 
 export interface IUserProps {
   id?: string;
-  email: string;
-  displayName: string;
+  email?: string;
+  displayName?: string;
   avatar?: string | undefined;
 };
 

@@ -62,52 +62,6 @@ export const getAllChats = createAsyncThunk('chats/get', async (args: IGetAllCha
         users: item.data().users
       });
     });
-      // const documentSnapshot = await new Promise(async (resolve) => {
-        
-        // const messagesData = await chatsRef.doc(item.id).collection('Messages').orderBy('createdAt', 'desc').limit(1).get();
-        
-        // const messagesData = await new Promise(async (resolve) => {
-        //   const data = await chatsRef.doc(item.id).collection('Messages').orderBy('createdAt', 'desc').limit(1).get();
-        //   resolve(data);
-        // });
-
-        // const latestMessage: FirebaseFirestoreTypes.DocumentSnapshot = await new Promise(async (resolveLatest) => {
-        //   const dd = await chatsRef.doc(item.id).collection('Messages').doc(item.data().latestMessageId).get();
-
-        //   resolveLatest(dd);
-        // });
-        // const latestMessage = await chatsRef.doc(item.id).collection('Messages').doc(item.data().latestMessageId).get();
-
-        // console.log('LATEST', latestMessage.id)
-        // resolve(item.data())
-        // if(messagesData.size > 0 && messagesData.docs[0].exists) {
-        //   const latestMessage: IMessageProps = messagesData.docs[0].data() as IMessageProps;
-          
-        //   const userId = item.data().users.filter((id: string) => id !== args.authUserId)[0];
-        //   const userData = await userRef.doc(userId).get();
-        //   let user = {
-        //     id: userData.id,
-        //     displayName: userData.data()?.displayName,
-        //     email: userData.data()?.email
-        //   }
-
-        //   chatList.push({
-        //     id: item.id,
-        //     user: user,
-        //     latestMessage: latestMessage,
-        //     updatedAt: item.data().updatedAt,
-        //     isViewed: (latestMessage.userId !== args.authUserId) ? item.data().viewed : true
-        //   });
-
-        //   resolve({
-        //     id: item.id,
-        //     user: user,
-        //     latestMessage: latestMessage,
-        //     updatedAt: item.data().updatedAt,
-        //     isViewed: (latestMessage.userId !== args.authUserId) ? item.data().viewed : true
-        //   });
-        // }
-      // });
   }
 
   await Promise.all(chatDocuments.map(async (item) => {

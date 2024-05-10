@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { IContactProps, IUserProps } from "../interfaces/User";
-import firestore from '@react-native-firebase/firestore';
+import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 
 interface IContactStateProps {
   loading: boolean;
@@ -14,39 +14,26 @@ const initialState: IContactStateProps = {
   error: undefined
 };
 
-export const getAllContacts = createAsyncThunk('contacts/get', async (arg: string, {rejectWithValue}) => {
+export const getAllContacts = createAsyncThunk('contacts/get', async (contactSnapshot: FirebaseFirestoreTypes.QuerySnapshot) => {
   const contactsRef = firestore().collection('Contacts');
-  const chatsRef = firestore().collection('Chats');
+  const usersRef = firestore().collection('Users');
+  let contacts: IUserProps[] = [];
 
-  const contacts = await new Promise((resolve) => {
-    contactsRef
-    .where('userId', '==', arg)
-    .onSnapshot(async (contactsSnapshot) => {
-      let userContacts: IUserProps[] = [];
-      if(contactsSnapshot.size > 0) {
-        await Promise.all(contactsSnapshot.docs[0].data().contacts.map(async (item: string) => {
-          await new Promise(async resolve => {
-            const user = await firestore().collection('Users').doc(item).get();
-            if(user.exists && user.data()) {
-              userContacts.push({
-                id: user.id,
-                email: user.data()?.email,
-                displayName: user.data()?.displayName
-              });
-            }
-            resolve(true);
-          });
-        }));
-      }
-      
-      resolve(userContacts);
-    });
-  }).catch(error => {
-    return undefined;
-  });
+  if(!contactSnapshot.empty && contactSnapshot.size > 0) {
+    const userContacts = await contactsRef.doc(contactSnapshot.docs[0].id).collection('Users').get();
+    if(!userContacts.empty && userContacts.size > 0) {
+      userContacts.docs.map(item => {
+        contacts.push({id: item.data().userId});
+      });
 
-  if(!contacts) {
-    return rejectWithValue('Something went wrong!')
+      await Promise.all(contacts.map(async item => {
+        const user = await usersRef.doc(item.id).get();
+        if(user.exists) {
+          item.email = user.data()?.email;
+          item.displayName = user.data()?.displayName;
+        }
+      }));
+    }
   }
 
   return contacts;
@@ -62,7 +49,7 @@ const contactSlice = createSlice({
       })
       .addCase(getAllContacts.fulfilled, (state, action) => {
         state.loading = false;
-        state.contacts = action.payload as IUserProps[];
+        state.contacts = action.payload;
         state.error = undefined;
       })
       .addCase(getAllContacts.rejected, (state, action) => {
